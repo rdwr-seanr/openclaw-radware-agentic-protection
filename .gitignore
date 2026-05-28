@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+node_modules/
+*.tgz
+.npmrc
+reports/*-raw*.json
+reports/*-raw*.jsonl
+reports/*-secrets*.log
+evidence/
+tmp/

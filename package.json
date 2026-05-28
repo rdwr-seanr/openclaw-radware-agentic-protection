@@ -1,0 +1,23 @@
+{
+  "name": "openclaw-radware-agentic-validation",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Validation harness and docs for Radware Agentic AI Protection on OpenClaw",
+  "type": "module",
+  "scripts": {
+    "check": "node --check scripts/validate-radware.mjs && node --check scripts/probe-inpath-behavioral-rd-format.mjs && node --check scripts/probe-outpath-controls.mjs && node --check scripts/smoke-plugin-hook.mjs && npm run check:plugin",
+    "validate:connectivity": "node scripts/validate-radware.mjs --connectivity",
+    "validate:compact": "node scripts/validate-radware.mjs --compact",
+    "validate:all": "node scripts/validate-radware.mjs --all",
+    "validate:inpath-behavioral": "node scripts/probe-inpath-behavioral-rd-format.mjs",
+    "validate:outpath-controls": "node scripts/probe-outpath-controls.mjs",
+    "validate:fail-modes": "node scripts/smoke-fail-modes.mjs",
+    "smoke:plugin-hook": "node scripts/smoke-plugin-hook.mjs",
+    "test:plugin-decisions": "node scripts/test-plugin-decisions.mjs",
+    "check:plugin": "npm --prefix plugins/openclaw-radware-agentic run check",
+    "pack:plugin": "npm pack --dry-run ./plugins/openclaw-radware-agentic"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

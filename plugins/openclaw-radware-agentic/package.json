@@ -1,0 +1,54 @@
+{
+  "name": "@radware/openclaw-agentic-protection",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "OpenClaw plugin for Radware Agentic AI Protection out-of-path tool enforcement",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "bin": {
+    "radware-openclaw-setup": "bin/setup.js"
+  },
+  "files": [
+    "src/",
+    "bin/",
+    "openclaw.plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "node --check src/index.js && node --check bin/setup.js"
+  },
+  "keywords": [
+    "openclaw",
+    "radware",
+    "agentic-ai",
+    "ai-security",
+    "prompt-injection",
+    "guardrails"
+  ],
+  "author": "Radware",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rdwr-seanr/openclaw-radware-agentic-protection.git",
+    "directory": "plugins/openclaw-radware-agentic"
+  },
+  "homepage": "https://github.com/rdwr-seanr/openclaw-radware-agentic-protection#readme",
+  "bugs": {
+    "url": "https://github.com/rdwr-seanr/openclaw-radware-agentic-protection/issues"
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.5.0"
+  },
+  "openclaw": {
+    "extensions": [
+      "./src/index.js"
+    ],
+    "compat": {
+      "pluginApi": ">=2026.5.0",
+      "minGatewayVersion": "2026.5.0"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "radware-agentic",
+  "name": "Radware Agentic AI Protection",
+  "description": "Enforces Radware Agentic AI Protection before OpenClaw tool execution.",
+  "version": "0.1.0",
+  "activation": {
+    "onStartup": true
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiKeyEnv": {
+        "type": "string",
+        "default": "RADWARE_OUT_OF_PATH_API_KEY"
+      },
+      "endpoint": {
+        "type": "string",
+        "default": "https://api.agentic.radwarecto.com/llmp/digester/agentic-api"
+      },
+      "model": {
+        "type": "string",
+        "default": "gpt-4o"
+      },
+      "userIdentifier": {
+        "type": "string",
+        "default": "openclaw-out-of-path"
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 1000,
+        "maximum": 120000,
+        "default": 15000
+      },
+      "failMode": {
+        "type": "string",
+        "enum": ["fail-close", "fail-open"],
+        "default": "fail-close"
+      },
+      "enforcementMode": {
+        "type": "string",
+        "enum": ["portal-decision"],
+        "default": "portal-decision"
+      },
+      "includeArgs": {
+        "type": "boolean",
+        "default": true
+      }
+    }
+  },
+  "uiHints": {
+    "apiKeyEnv": {
+      "label": "Radware API key environment variable",
+      "sensitive": true
+    },
+    "endpoint": {
+      "label": "Radware out-of-path endpoint"
+    },
+    "failMode": {
+      "label": "Failure mode"
+    },
+    "enforcementMode": {
+      "label": "Enforcement mode"
+    }
+  }
+}

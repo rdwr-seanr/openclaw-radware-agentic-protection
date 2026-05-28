@@ -1,0 +1,31 @@
+{
+  "models": {
+    "providers": {
+      "radware-openai": {
+        "baseUrl": "${RADWARE_INPATH_BASE_URL}",
+        "apiKey": "${RADWARE_INPATH_API_KEY}",
+        "auth": "api-key",
+        "api": "openai-completions",
+        "timeoutSeconds": 180,
+        "models": [
+          {
+            "id": "gpt-4o",
+            "name": "Radware-proxied OpenAI GPT-4o",
+            "api": "openai-completions",
+            "reasoning": false,
+            "input": ["text"],
+            "contextWindow": 128000,
+            "maxTokens": 4096
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "radware-openai/gpt-4o"
+      }
+    }
+  }
+}
