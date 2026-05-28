@@ -23,13 +23,13 @@ Do not store keys in `openclaw.json`, Git, screenshots, validation reports, or l
 Install OpenClaw as usual, then install the Radware plugin when out-of-path protection is required:
 
 ```bash
-openclaw plugins install @radware/openclaw-agentic-protection
+openclaw plugins install openclaw-radware-agentic-protection
 ```
 
 The same NPM package also includes a setup helper:
 
 ```bash
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --help
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --help
 ```
 
 ## Configure Runtime Variables
@@ -75,9 +75,9 @@ mkdir -p "$OPENCLAW_HOME/.openclaw"
 Add in-path, out-of-path, or both independent controls:
 
 ```bash
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --in-path --dry-run
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --out-of-path --dry-run
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --in-path --out-of-path --set-default-model
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --in-path --dry-run
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --out-of-path --dry-run
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --in-path --out-of-path --set-default-model
 ```
 
 ## Existing OpenClaw Deployment
@@ -87,14 +87,14 @@ Do not overwrite the customer's existing `~/.openclaw/openclaw.json`.
 The setup helper merges only the requested Radware entries and writes a timestamped backup:
 
 ```bash
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --out-of-path --dry-run
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --out-of-path
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --out-of-path --dry-run
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --out-of-path
 ```
 
 For in-path on an existing deployment:
 
 ```bash
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --in-path
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --in-path
 ```
 
 Review the diff, restart the OpenClaw gateway, and inspect the plugin:

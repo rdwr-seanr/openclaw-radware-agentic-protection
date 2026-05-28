@@ -11,7 +11,7 @@ Out-of-path protection keeps the customer's normal OpenClaw LLM provider and add
 ## Install
 
 ```bash
-openclaw plugins install @radware/openclaw-agentic-protection
+openclaw plugins install openclaw-radware-agentic-protection
 ```
 
 ## Configure
@@ -28,8 +28,8 @@ export RADWARE_FAIL_MODE="fail-close"
 Use the setup helper:
 
 ```bash
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --out-of-path --dry-run
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --out-of-path
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --out-of-path --dry-run
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --out-of-path
 ```
 
 The setup helper edits only the Radware plugin entry and preserves existing OpenClaw channels, agents, tools, and model providers.

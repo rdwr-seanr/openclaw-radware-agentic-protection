@@ -224,7 +224,7 @@ try {
   }
   if (args.outOfPath) {
     console.log(`- Export RADWARE_OUT_OF_PATH_API_KEY and RADWARE_OUT_OF_PATH_URL=${DEFAULT_OUTPATH_URL}`);
-    console.log("- Install the plugin with: openclaw plugins install @radware/openclaw-agentic-protection");
+    console.log("- Install the plugin with: openclaw plugins install openclaw-radware-agentic-protection");
   }
   console.log("- Restart the OpenClaw gateway and run the validation commands from the README.");
 } catch (error) {

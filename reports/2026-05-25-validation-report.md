@@ -207,7 +207,7 @@ Publish: yes.
 Published Git/NPM scope:
 
 - Repository: `openclaw-radware-agentic-protection`
-- NPM package: `@radware/openclaw-agentic-protection`
+- NPM package: `openclaw-radware-agentic-protection`
 - Main customer docs: `README.md` and `docs/`
 - OpenClaw plugin package: `plugins/openclaw-radware-agentic/`
 
@@ -216,5 +216,5 @@ Published Git/NPM scope:
 - In-path Behavioral works when the Chat Completions transcript uses the correct tool-output shape and a risky tool call is emitted. Natural/auto mode may still refuse before tool emission, so validation should include a forced or otherwise deterministic tool-call case.
 - Out-of-path fail-open/fail-close is implemented and validated in the plugin. In-path is fail-close by default unless a future explicit direct-provider fallback wrapper is added.
 - In-path portal User Name attribution needs portal verification using the generated identity-candidate Event IDs.
-- The connector has been packaged as `@radware/openclaw-agentic-protection` for NPM publication.
+- The connector has been packaged as `openclaw-radware-agentic-protection` for NPM publication.
 - No DOCX was created.

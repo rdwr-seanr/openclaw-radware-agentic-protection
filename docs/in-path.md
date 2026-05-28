@@ -41,14 +41,14 @@ The OpenClaw provider API key must be the Radware in-path key. The customer Open
 ## Setup Helper
 
 ```bash
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --in-path --dry-run
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --in-path
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --in-path --dry-run
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --in-path
 ```
 
 To also set OpenClaw's default model:
 
 ```bash
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --in-path --set-default-model
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --in-path --set-default-model
 ```
 
 ## Validation

@@ -13,7 +13,7 @@ OpenClaw plugin for Radware Agentic AI Protection out-of-path tool enforcement.
 ## Install
 
 ```bash
-openclaw plugins install @radware/openclaw-agentic-protection
+openclaw plugins install openclaw-radware-agentic-protection
 ```
 
 ## Configure Out-Of-Path Enforcement
@@ -56,8 +56,8 @@ Add the plugin entry:
 Or use the setup helper:
 
 ```bash
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --out-of-path --dry-run
-npx -p @radware/openclaw-agentic-protection radware-openclaw-setup --out-of-path
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --out-of-path --dry-run
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup --out-of-path
 ```
 
 ## In-Path Is Configured Separately
