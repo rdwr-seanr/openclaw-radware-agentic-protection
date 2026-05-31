@@ -40,6 +40,34 @@ export RADWARE_FAIL_MODE="fail-close"
 
 Out-of-path deployments also require the customer's normal LLM provider credentials, such as `OPENAI_API_KEY`, because Radware does not replace the LLM provider in out-of-path mode.
 
+## Upgrade From 0.1.0
+
+Version `0.1.1` and later are production-safe by default:
+
+- The setup helper expects an existing onboarded OpenClaw config.
+- The setup helper refuses `--in-path --out-of-path` in the same deployment.
+- The docs present in-path and out-of-path as mutually exclusive deployment options.
+
+If you previously ran the `0.1.0` setup helper on a fresh server before OpenClaw onboarding, it may have created a partial `openclaw.json`. If OpenClaw reports `existing config is missing gateway.mode`, move that partial file aside and onboard OpenClaw first:
+
+```bash
+mv ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bad-partial
+openclaw onboard --mode local
+```
+
+Then rerun setup with the latest package and choose exactly one path:
+
+```bash
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --set-default-model
+```
+
+or:
+
+```bash
+openclaw plugins install openclaw-radware-agentic-protection@latest
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path
+```
+
 ## Choose One Integration Path
 
 Choose exactly one integration path for a given OpenClaw deployment. Do not configure in-path and out-of-path together in the same OpenClaw deployment. To evaluate the two approaches, use separate OpenClaw environments or separate change windows.
@@ -51,7 +79,7 @@ Use in-path when Radware should sit inline on OpenClaw provider traffic.
 Dry-run the change:
 
 ```bash
-npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --set-default-model \
   --dry-run
@@ -60,7 +88,7 @@ npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
 Apply the change:
 
 ```bash
-npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --set-default-model
 ```
@@ -82,13 +110,13 @@ Use out-of-path when the customer wants to keep the existing OpenClaw LLM provid
 Install the plugin:
 
 ```bash
-openclaw plugins install openclaw-radware-agentic-protection
+openclaw plugins install openclaw-radware-agentic-protection@latest
 ```
 
 Dry-run the config merge:
 
 ```bash
-npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path \
   --dry-run
 ```
@@ -96,7 +124,7 @@ npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
 Apply the config merge:
 
 ```bash
-npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path
 ```
 

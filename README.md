@@ -40,15 +40,43 @@ export RADWARE_USER_IDENTIFIER="openclaw-out-of-path"
 export RADWARE_FAIL_MODE="fail-close"
 ```
 
+## Upgrade From 0.1.0
+
+Version `0.1.1` and later are production-safe by default:
+
+- The setup helper expects an existing onboarded OpenClaw config.
+- The setup helper refuses `--in-path --out-of-path` in the same deployment.
+- The docs present in-path and out-of-path as mutually exclusive deployment options.
+
+If you previously ran the `0.1.0` setup helper on a fresh server before OpenClaw onboarding, it may have created a partial `openclaw.json`. If OpenClaw reports `existing config is missing gateway.mode`, move that partial file aside and onboard OpenClaw first:
+
+```bash
+mv ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bad-partial
+openclaw onboard --mode local
+```
+
+Then rerun setup with the latest package and choose exactly one path:
+
+```bash
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --set-default-model
+```
+
+or:
+
+```bash
+openclaw plugins install openclaw-radware-agentic-protection@latest
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path
+```
+
 ### In-Path Only
 
 ```bash
-npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --set-default-model \
   --dry-run
 
-npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --set-default-model
 ```
@@ -58,13 +86,13 @@ Restart OpenClaw with the environment variables loaded.
 ### Out-Of-Path Only
 
 ```bash
-openclaw plugins install openclaw-radware-agentic-protection
+openclaw plugins install openclaw-radware-agentic-protection@latest
 
-npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path \
   --dry-run
 
-npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path
 ```
 

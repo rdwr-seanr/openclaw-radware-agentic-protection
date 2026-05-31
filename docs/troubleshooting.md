@@ -21,6 +21,14 @@ The helper expects an existing, onboarded OpenClaw config. This usually means Op
 
 For production, do not let the helper create a new OpenClaw config from scratch. Run it against the existing customer config.
 
+If this happened in a fresh lab after running version `0.1.0`, move the partial config aside, onboard OpenClaw, and rerun the latest setup helper:
+
+```bash
+mv ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bad-partial
+openclaw onboard --mode local
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --help
+```
+
 ## Out-Of-Path Checks Run But LLM Calls Fail
 
 Out-of-path protection does not replace the LLM provider. Confirm the customer has configured their normal OpenClaw model provider and LLM provider key, such as `OPENAI_API_KEY`.
