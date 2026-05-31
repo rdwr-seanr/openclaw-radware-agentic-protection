@@ -1,6 +1,8 @@
 # Out-Of-Path OpenClaw Integration
 
-Out-of-path protection keeps the customer's normal OpenClaw LLM provider and adds an explicit Radware pre-tool check.
+Out-of-path protection keeps the customer's normal OpenClaw LLM provider and adds explicit Radware checks from OpenClaw lifecycle hooks. The included plugin enforces before tool execution; the same explicit API pattern can also be wired to prompt/response stages if the OpenClaw environment exposes suitable hooks.
+
+Assumption: OpenClaw is already installed, onboarded, and has an existing `openclaw.json`. Run setup commands as the same OS user that runs the OpenClaw gateway.
 
 ## Required Credentials
 
@@ -32,11 +34,13 @@ npx -p openclaw-radware-agentic-protection radware-openclaw-setup --out-of-path 
 npx -p openclaw-radware-agentic-protection radware-openclaw-setup --out-of-path
 ```
 
+If OpenClaw uses a custom config path, add `--config /path/to/openclaw.json`.
+
 The setup helper edits only the Radware plugin entry and preserves existing OpenClaw channels, agents, tools, and model providers.
 
 ## What The Plugin Sends
 
-Before tool execution, the plugin sends:
+Before tool execution, the included plugin sends:
 
 - `UserPrompt`: accumulated trusted user intent.
 - `UserIdentifier`: mode-specific portal identity, default `openclaw-out-of-path`.

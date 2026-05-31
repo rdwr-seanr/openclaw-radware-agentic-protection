@@ -2,6 +2,37 @@
 
 Run validation after configuring the Radware portal, OpenClaw, and runtime environment variables.
 
+For customer production environments, validate through an existing OpenClaw staging channel or a low-risk test agent. Do not clone this repository or run the advanced scripts unless Radware support asks for deeper evidence.
+
+## Customer Validation
+
+Record these fields for every test:
+
+- Integration path: in-path or out-of-path.
+- Radware portal User Name.
+- Provider/model.
+- Expected result.
+- Actual result.
+- Event ID.
+- Module: AI Guardrails or Behavioral / Agentic Protection.
+- Portal policy: Block and Report or Report Only.
+
+Minimum non-destructive tests:
+
+- Benign prompt: should be allowed.
+- Credit-card PII test: should follow the AI Guardrails template.
+- HAPBlocker test: should follow the AI Guardrails template.
+- Blocked medical/medicine topic: should follow the AI Guardrails template.
+- Behavioral tool/action test: use a staging tool or low-risk action, such as a test email to an internal address or a dry-run write action.
+
+Out-of-path enforcement runs only when OpenClaw is about to execute a tool. A normal chat prompt without a tool call will not exercise the out-of-path plugin.
+
+In-path Behavioral validation requires the provider request to include tool/action context. A simple chat prompt may exercise AI Guardrails but not Behavioral / Agentic Protection.
+
+## Advanced Radware Validation Scripts
+
+The commands below are for Radware lab validation from the GitHub repository, not the normal customer deployment path.
+
 ## Environment
 
 ```bash
@@ -24,7 +55,7 @@ For Block and Report policies:
 export RADWARE_BEHAVIORAL_POLICY=block-and-report
 ```
 
-## Commands
+## Advanced Commands
 
 ```bash
 npm run validate:connectivity

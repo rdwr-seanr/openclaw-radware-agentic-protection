@@ -22,7 +22,7 @@ OpenClaw must use the Radware in-path API key as the model-provider API key. Do 
 5. Set it at runtime as `RADWARE_OUT_OF_PATH_API_KEY`.
 6. Keep the customer's own LLM provider configured separately in OpenClaw.
 
-The out-of-path plugin sends explicit pre-tool checks to Radware. It does not replace the LLM provider.
+The included out-of-path plugin sends explicit checks to Radware before tool execution. The out-of-path API pattern can also be wired to other OpenClaw lifecycle stages when suitable hooks are available. It does not replace the LLM provider.
 
 ## Policy Modes
 

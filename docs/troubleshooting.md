@@ -4,6 +4,23 @@
 
 Check that the OpenClaw provider uses the Radware in-path API key and Radware in-path base URL. Do not use the customer's OpenAI API key in the Radware in-path provider entry.
 
+## Setup Helper Says Config Is Missing
+
+Run the helper as the same OS user that runs OpenClaw. If OpenClaw uses a custom home or config path, set `OPENCLAW_HOME` or pass `--config`:
+
+```bash
+npx -p openclaw-radware-agentic-protection radware-openclaw-setup \
+  --out-of-path \
+  --config /path/to/openclaw.json \
+  --dry-run
+```
+
+## Setup Helper Says `gateway.mode` Is Missing
+
+The helper expects an existing, onboarded OpenClaw config. This usually means OpenClaw was not onboarded yet, the wrong OS user was used, or the wrong config path was selected.
+
+For production, do not let the helper create a new OpenClaw config from scratch. Run it against the existing customer config.
+
 ## Out-Of-Path Checks Run But LLM Calls Fail
 
 Out-of-path protection does not replace the LLM provider. Confirm the customer has configured their normal OpenClaw model provider and LLM provider key, such as `OPENAI_API_KEY`.

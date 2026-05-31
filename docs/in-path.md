@@ -1,6 +1,8 @@
 # In-Path OpenClaw Integration
 
-In-path protection routes OpenClaw model traffic through Radware's OpenAI-compatible proxy.
+In-path protection routes OpenClaw provider traffic through Radware's OpenAI-compatible proxy. It can protect prompt, response, and tool/action context when OpenClaw sends that context through the provider request.
+
+Assumption: OpenClaw is already installed, onboarded, and has an existing `openclaw.json`. Run setup commands as the same OS user that runs the OpenClaw gateway.
 
 ## Required Credentials
 
@@ -45,6 +47,8 @@ npx -p openclaw-radware-agentic-protection radware-openclaw-setup --in-path --dr
 npx -p openclaw-radware-agentic-protection radware-openclaw-setup --in-path
 ```
 
+If OpenClaw uses a custom config path, add `--config /path/to/openclaw.json`.
+
 To also set OpenClaw's default model:
 
 ```bash
@@ -55,7 +59,7 @@ npx -p openclaw-radware-agentic-protection radware-openclaw-setup --in-path --se
 
 Run a benign prompt through the Radware provider, then run AI Guardrails tests for credit-card PII, HAPBlocker, and blocked medical/medicine topics.
 
-In-path Behavioral validation requires the model/proxy flow to emit a tool call. For deterministic validation, use a proper Chat Completions tool transcript: `user`, `assistant` with `tool_calls`, `tool`, then a follow-up `user`.
+In-path Behavioral validation requires the model/proxy flow to include the tool/action context. For deterministic validation, use a proper Chat Completions tool transcript: `user`, `assistant` with `tool_calls`, `tool`, then a follow-up `user`.
 
 ## Fail-Open / Fail-Close
 

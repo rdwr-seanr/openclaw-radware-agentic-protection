@@ -11,10 +11,10 @@ function usage(exitCode = 0) {
   console.log(`Radware OpenClaw setup
 
 Usage:
-  radware-openclaw-setup --in-path [--out-of-path] [options]
+  radware-openclaw-setup --in-path [options]
   radware-openclaw-setup --out-of-path [options]
 
-Controls:
+Integration path:
   --in-path                 Add the Radware in-path OpenAI-compatible provider.
   --out-of-path             Add the Radware out-of-path plugin entry.
 
@@ -25,6 +25,7 @@ Options:
   --set-default-model       Set agents.defaults.model.primary to the Radware in-path provider.
   --user-identifier <id>    Out-of-path Radware UserIdentifier. Default: openclaw-out-of-path.
   --fail-mode <mode>        fail-close or fail-open for out-of-path API unavailability. Default: fail-close.
+  --allow-unconfigured      Advanced/lab only: allow writing a config without gateway.mode.
   --dry-run                 Print the merged config without writing.
   --help                    Show this help.
 
@@ -46,6 +47,7 @@ function parseArgs(argv) {
     setDefaultModel: false,
     userIdentifier: process.env.RADWARE_USER_IDENTIFIER || "openclaw-out-of-path",
     failMode: process.env.RADWARE_FAIL_MODE || "fail-close",
+    allowUnconfigured: false,
     dryRun: false,
   };
 
@@ -85,6 +87,9 @@ function parseArgs(argv) {
       case "--fail-mode":
         args.failMode = next();
         break;
+      case "--allow-unconfigured":
+        args.allowUnconfigured = true;
+        break;
       case "--dry-run":
         args.dryRun = true;
         break;
@@ -98,7 +103,12 @@ function parseArgs(argv) {
   }
 
   if (!args.inPath && !args.outOfPath) {
-    throw new Error("Choose at least one control: --in-path and/or --out-of-path");
+    throw new Error("Choose exactly one integration path: --in-path or --out-of-path");
+  }
+  if (args.inPath && args.outOfPath) {
+    throw new Error(
+      "Choose exactly one integration path per OpenClaw deployment. Do not configure --in-path and --out-of-path together.",
+    );
   }
   if (!["fail-close", "fail-open"].includes(args.failMode)) {
     throw new Error("--fail-mode must be fail-close or fail-open");
@@ -178,10 +188,30 @@ function addOutOfPath(config, args) {
 
 async function loadConfig(configPath) {
   if (!existsSync(configPath)) {
-    return {};
+    throw new Error(
+      `OpenClaw config not found: ${configPath}\n` +
+        "This setup helper is production-safe by default and expects an existing OpenClaw deployment. " +
+        "Run it as the OpenClaw service user, set OPENCLAW_HOME or --config to the existing config path, " +
+        "or run OpenClaw onboarding first in a lab environment.",
+    );
   }
   const content = await readFile(configPath, "utf8");
   return JSON.parse(content);
+}
+
+function validateExistingConfig(config, configPath, args) {
+  if (args.allowUnconfigured) {
+    return;
+  }
+  if (!config.gateway || typeof config.gateway !== "object" || !config.gateway.mode) {
+    throw new Error(
+      `OpenClaw config at ${configPath} is missing gateway.mode.\n` +
+        "This usually means OpenClaw was not onboarded yet, the wrong user/config path was used, " +
+        "or the config was created from scratch. For production, run this helper against the existing " +
+        "OpenClaw config after OpenClaw has already been configured. For a lab-only fresh install, run " +
+        "`openclaw onboard --mode local` first or pass --allow-unconfigured intentionally.",
+    );
+  }
 }
 
 async function backupExisting(configPath) {
@@ -198,6 +228,7 @@ try {
   const args = parseArgs(process.argv.slice(2));
   const configPath = path.resolve(expandHome(args.configPath || defaultConfigPath()));
   const config = await loadConfig(configPath);
+  validateExistingConfig(config, configPath, args);
 
   if (args.inPath) addInPath(config, args);
   if (args.outOfPath) addOutOfPath(config, args);
@@ -226,7 +257,7 @@ try {
     console.log(`- Export RADWARE_OUT_OF_PATH_API_KEY and RADWARE_OUT_OF_PATH_URL=${DEFAULT_OUTPATH_URL}`);
     console.log("- Install the plugin with: openclaw plugins install openclaw-radware-agentic-protection");
   }
-  console.log("- Restart the OpenClaw gateway and run the validation commands from the README.");
+  console.log("- Restart the OpenClaw gateway and run non-destructive validation through an OpenClaw staging channel or test agent.");
 } catch (error) {
   console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
   usage(1);
