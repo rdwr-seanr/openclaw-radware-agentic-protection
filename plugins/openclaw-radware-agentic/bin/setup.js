@@ -186,6 +186,35 @@ function addOutOfPath(config, args) {
   };
 }
 
+function hasRadwareInPathProvider(config) {
+  const providers = config?.models?.providers;
+  if (!providers || typeof providers !== "object" || Array.isArray(providers)) {
+    return false;
+  }
+  return Object.values(providers).some((provider) => {
+    if (!provider || typeof provider !== "object" || Array.isArray(provider)) {
+      return false;
+    }
+    return (
+      provider.apiKey === "${RADWARE_INPATH_API_KEY}" ||
+      provider.baseUrl === "${RADWARE_INPATH_BASE_URL}"
+    );
+  });
+}
+
+function hasRadwareOutOfPathPlugin(config) {
+  const entry = config?.plugins?.entries?.["radware-agentic"];
+  if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+    return false;
+  }
+  const pluginConfig = entry.config || {};
+  return (
+    entry.enabled !== false &&
+    (pluginConfig.apiKeyEnv === "RADWARE_OUT_OF_PATH_API_KEY" ||
+      pluginConfig.endpoint === "${RADWARE_OUT_OF_PATH_URL}")
+  );
+}
+
 async function loadConfig(configPath) {
   if (!existsSync(configPath)) {
     throw new Error(
@@ -214,6 +243,23 @@ function validateExistingConfig(config, configPath, args) {
   }
 }
 
+function validateSingleIntegrationPath(config, configPath, args) {
+  if (args.inPath && hasRadwareOutOfPathPlugin(config)) {
+    throw new Error(
+      `OpenClaw config at ${configPath} already contains the Radware out-of-path plugin.\n` +
+        "Choose exactly one Radware integration path for this OpenClaw deployment. " +
+        "Use a separate OpenClaw environment or remove the out-of-path plugin entry before configuring in-path.",
+    );
+  }
+  if (args.outOfPath && hasRadwareInPathProvider(config)) {
+    throw new Error(
+      `OpenClaw config at ${configPath} already contains a Radware in-path provider.\n` +
+        "Choose exactly one Radware integration path for this OpenClaw deployment. " +
+        "Use a separate OpenClaw environment or remove the in-path provider before configuring out-of-path.",
+    );
+  }
+}
+
 async function backupExisting(configPath) {
   if (!existsSync(configPath)) {
     return "";
@@ -229,6 +275,7 @@ try {
   const configPath = path.resolve(expandHome(args.configPath || defaultConfigPath()));
   const config = await loadConfig(configPath);
   validateExistingConfig(config, configPath, args);
+  validateSingleIntegrationPath(config, configPath, args);
 
   if (args.inPath) addInPath(config, args);
   if (args.outOfPath) addOutOfPath(config, args);

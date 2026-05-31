@@ -45,7 +45,7 @@ Out-of-path deployments also require the customer's normal LLM provider credenti
 Version `0.1.1` and later are production-safe by default:
 
 - The setup helper expects an existing onboarded OpenClaw config.
-- The setup helper refuses `--in-path --out-of-path` in the same deployment.
+- The setup helper refuses `--in-path --out-of-path` and also refuses adding one Radware path to a config that already contains the other Radware path.
 - The docs present in-path and out-of-path as mutually exclusive deployment options.
 
 If you previously ran the `0.1.0` setup helper on a fresh server before OpenClaw onboarding, it may have created a partial `openclaw.json`. If OpenClaw reports `existing config is missing gateway.mode`, move that partial file aside and onboard OpenClaw first:
