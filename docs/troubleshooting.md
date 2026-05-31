@@ -37,6 +37,10 @@ Out-of-path protection does not replace the LLM provider. Confirm the customer h
 
 That is expected. Report Only should allow execution and record the finding in the Radware portal. Use Block and Report when enforcement should stop the action.
 
+## Gateway Looks Stuck After Start
+
+`openclaw gateway --force` starts the gateway in the foreground. It is healthy when the log shows `gateway] ready`; leave it running in that terminal, run it under the customer's service manager, or stop it with `Ctrl+C`.
+
 ## Plugin Does Not Register Hooks
 
 Run:

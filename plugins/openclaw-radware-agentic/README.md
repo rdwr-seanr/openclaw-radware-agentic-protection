@@ -103,6 +103,8 @@ The customer OpenAI API key is not used by this in-path provider entry.
 
 Restart the OpenClaw gateway with the environment variables loaded.
 
+`openclaw gateway --force` is a foreground server process. Seeing `gateway] ready` means the gateway started successfully; the command is expected to keep running until stopped. Run it in the customer's normal service manager, terminal multiplexer, or a dedicated shell.
+
 ### Option B: Out-Of-Path Only
 
 Use out-of-path when the customer wants to keep the existing OpenClaw LLM provider and have Radware check tool actions before execution.
@@ -155,6 +157,8 @@ This adds:
 
 Restart the OpenClaw gateway with the environment variables loaded.
 
+`openclaw gateway --force` is a foreground server process. Seeing `gateway] ready` means the gateway started successfully; the command is expected to keep running until stopped. Run it in the customer's normal service manager, terminal multiplexer, or a dedicated shell.
+
 Inspect the plugin:
 
 ```bash
@@ -197,6 +201,14 @@ Minimum checks:
 - Blocked medical/medicine topic: should follow the portal policy.
 - Behavioral tool/action test: use an existing low-risk tool, such as a test email or dry-run write action. Out-of-path enforcement only runs when OpenClaw is about to execute a tool.
 
+Recommended flow:
+
+1. Start the OpenClaw gateway and wait for `gateway] ready`.
+2. Send a benign prompt through the customer's normal OpenClaw channel or Control UI.
+3. Send the AI Guardrails prompts through the same channel and verify Radware portal events.
+4. For out-of-path Behavioral validation, trigger a real low-risk tool action. A chat-only prompt will not call the plugin.
+5. For in-path Behavioral validation, make sure the provider request includes tool/action context. A normal chat prompt may only validate AI Guardrails.
+
 For each event, record:
 
 - OpenClaw integration path: in-path or out-of-path.
@@ -229,6 +241,10 @@ For a lab-only fresh install, onboard OpenClaw first, then rerun the helper.
 ### Out-Of-Path Does Not Generate Events
 
 Out-of-path enforcement runs before tool execution. If the OpenClaw workflow only chats with the LLM and does not call a tool, the plugin has nothing to enforce.
+
+### Gateway Looks Stuck After Start
+
+`openclaw gateway --force` starts the gateway in the foreground. It is healthy when the log shows `gateway] ready`; leave it running in that terminal, run it under the customer's service manager, or stop it with `Ctrl+C`.
 
 ### In-Path Does Not Show Expected Behavioral Result
 

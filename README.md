@@ -83,6 +83,8 @@ npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
 
 Restart OpenClaw with the environment variables loaded.
 
+`openclaw gateway --force` is a foreground server process. Seeing `gateway] ready` means the gateway started successfully; the command is expected to keep running until stopped.
+
 ### Out-Of-Path Only
 
 ```bash
@@ -101,6 +103,8 @@ Restart OpenClaw with the environment variables loaded, then inspect:
 ```bash
 openclaw plugins inspect radware-agentic --runtime --json
 ```
+
+`openclaw gateway --force` is a foreground server process. Seeing `gateway] ready` means the gateway started successfully; the command is expected to keep running until stopped.
 
 ## Portal Decision Modes
 
@@ -127,6 +131,14 @@ Minimum checks:
 - HAPBlocker: should follow portal policy.
 - Blocked medical/medicine topic: should follow portal policy.
 - Behavioral tool/action attempt: use a low-risk test tool action. Out-of-path enforcement only runs when OpenClaw is about to execute a tool.
+
+Recommended flow:
+
+1. Start the OpenClaw gateway and wait for `gateway] ready`.
+2. Send a benign prompt through the customer's normal OpenClaw channel or Control UI.
+3. Send the AI Guardrails prompts through the same channel and verify Radware portal events.
+4. For out-of-path Behavioral validation, trigger a real low-risk tool action. A chat-only prompt will not call the plugin.
+5. For in-path Behavioral validation, make sure the provider request includes tool/action context. A normal chat prompt may only validate AI Guardrails.
 
 For in-path Behavioral tests, represent retrieved content as tool output, not as a `system` message. Use this Chat Completions shape:
 
