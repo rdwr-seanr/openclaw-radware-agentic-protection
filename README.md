@@ -68,6 +68,19 @@ openclaw plugins install openclaw-radware-agentic-protection@latest
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path
 ```
 
+## Package Version Policy
+
+Use `openclaw-radware-agentic-protection@latest` for customer deployments. Version `0.1.4` and later include the production-safe deployment flow, foreground gateway guidance, and strict one-path-per-OpenClaw-deployment guardrails.
+
+Do not unpublish previous NPM versions as a normal maintenance action. Unpublishing can break pinned installs and those version numbers cannot be reused. If a previous version should no longer be used, deprecate it with an upgrade message instead:
+
+```bash
+npm deprecate openclaw-radware-agentic-protection@"<0.1.4" \
+  "Please upgrade to 0.1.4 or later. Earlier versions were superseded by production-safe OpenClaw deployment guidance and stricter in-path/out-of-path validation."
+```
+
+Deprecation preserves reproducibility for pinned users while showing a clear install-time warning.
+
 ### In-Path Only
 
 ```bash
@@ -175,6 +188,7 @@ For in-path Behavioral tests, represent retrieved content as tool output, not as
 - [Out-of-path setup](docs/out-of-path.md)
 - [Validation guide](docs/validation.md)
 - [Fail-open and fail-close](docs/fail-open-fail-close.md)
+- [Package version policy](docs/package-version-policy.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Validation report](reports/2026-05-25-validation-report.md)
 
