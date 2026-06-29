@@ -2,8 +2,9 @@
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-const ROOT = path.resolve(new URL("..", import.meta.url).pathname);
+const ROOT = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const PLUGIN_PATH = path.join(ROOT, "plugins", "openclaw-radware-agentic", "src", "index.js");
 
 async function loadDotEnv() {
@@ -28,7 +29,7 @@ async function loadDotEnv() {
 
 await loadDotEnv();
 
-const plugin = (await import(PLUGIN_PATH)).default;
+const plugin = (await import(pathToFileURL(PLUGIN_PATH).href)).default;
 const handlers = new Map();
 plugin.register({
   on(name, handler, opts = {}) {
@@ -60,6 +61,7 @@ async function runMode(failMode) {
           model: process.env.LLM_MODEL || "gpt-4o",
           timeoutMs: 1000,
           failMode,
+          diagnostics: { level: "off" },
         },
       },
     },

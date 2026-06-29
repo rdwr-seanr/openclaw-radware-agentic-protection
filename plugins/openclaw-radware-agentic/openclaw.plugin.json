@@ -1,8 +1,8 @@
 {
   "id": "radware-agentic",
   "name": "Radware Agentic AI Protection",
-  "description": "Enforces Radware Agentic AI Protection before OpenClaw tool execution.",
-  "version": "0.1.0",
+  "description": "Enforces Radware Agentic AI Protection at OpenClaw prompt, response, and tool stages.",
+  "version": "0.2.0",
   "activation": {
     "onStartup": true
   },
@@ -45,6 +45,39 @@
       "includeArgs": {
         "type": "boolean",
         "default": true
+      },
+      "stages": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "prompt": {
+            "type": "boolean",
+            "default": false
+          },
+          "response": {
+            "type": "boolean",
+            "default": false
+          },
+          "tool": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "diagnostics": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": ["off", "error", "info"],
+            "default": "error"
+          },
+          "logFileEnv": {
+            "type": "string",
+            "default": "RADWARE_AGENTIC_DIAGNOSTIC_LOG"
+          }
+        }
       }
     }
   },
@@ -61,6 +94,12 @@
     },
     "enforcementMode": {
       "label": "Enforcement mode"
+    },
+    "stages": {
+      "label": "Radware enforcement stages"
+    },
+    "diagnostics": {
+      "label": "Sanitized diagnostics"
     }
   }
 }

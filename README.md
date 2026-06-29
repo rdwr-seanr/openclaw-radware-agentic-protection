@@ -7,7 +7,7 @@ For customer deployment, use the NPM package. GitHub is for source review, detai
 It supports two deployment options. Choose exactly one option for a given OpenClaw deployment:
 
 - In-path / inline protection: route OpenClaw provider traffic through Radware's OpenAI-compatible proxy, including prompt, response, and tool-call context when OpenClaw sends that context through the provider request.
-- Out-of-path protection: call Radware explicitly from OpenClaw lifecycle hooks at the stages the customer chooses. The included plugin enforces before tool execution and preserves the customer's existing LLM provider.
+- Out-of-path protection: call Radware explicitly from OpenClaw lifecycle hooks. New setup-generated configs enable prompt, response, and tool-stage checks while preserving the customer's existing LLM provider.
 
 Each deployment type can support AI Guardrails and Behavioral / Agentic Protection when the relevant prompt, response, tool, and context payloads are sent to Radware. Do not configure in-path and out-of-path together in the same OpenClaw deployment. To evaluate the two approaches, test them in separate OpenClaw environments or separate change windows.
 
@@ -16,9 +16,9 @@ Each deployment type can support AI Guardrails and Behavioral / Agentic Protecti
 | Control | Radware key | Customer LLM key |
 | --- | --- | --- |
 | In-path | Required. Use the Radware in-path API key as the OpenClaw model-provider API key. | Not used by the Radware in-path provider entry. |
-| Out-of-path | Required. Use the Radware out-of-path API key for explicit Radware checks. | Still required for the customer's normal OpenClaw LLM provider, for example OpenAI. |
+| Out-of-path | Required. Use the Radware out-of-path API key for explicit Radware checks. | Not collected or changed by this package. The customer's existing OpenClaw LLM provider keeps using its own key and endpoint. |
 
-Do not store keys in `openclaw.json`, Git, screenshots, validation reports, or logs. Use runtime environment variables or an uncommitted `.env`.
+Do not store keys in `openclaw.json`, Git, screenshots, validation reports, or logs. Use runtime environment variables, a secret manager, or the setup-generated chmod `600` env file.
 
 ## Customer Deployment
 
@@ -26,18 +26,23 @@ Assumption: OpenClaw is already installed, onboarded, and has a valid `openclaw.
 
 Run all commands as the same OS user that owns the OpenClaw config and runs the OpenClaw gateway. If OpenClaw uses a custom config path, pass `--config /path/to/openclaw.json`.
 
-Set runtime variables through the customer's normal secret mechanism. Do not put real keys in `openclaw.json`.
+For the easiest installation, run the setup wizard:
 
 ```bash
-export RADWARE_INPATH_API_KEY="sk-rdwr-..."
-export RADWARE_INPATH_BASE_URL="https://api.agentic.radwarecto.com/v1/openai"
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup
+```
 
-export RADWARE_OUT_OF_PATH_API_KEY="sk-rdwr-..."
-export RADWARE_OUT_OF_PATH_URL="https://api.agentic.radwarecto.com/llmp/digester/agentic-api"
+The wizard asks which deployment type to configure, pre-fills the Radware endpoints, writes a backup of `openclaw.json`, and writes runtime variables to an env file with `0600` permissions. For out-of-path, it can also install the plugin with the deterministic OpenClaw source spec `npm:openclaw-radware-agentic-protection@latest`. It does not ask for the customer's LLM provider API key in out-of-path mode because that provider should already be configured in OpenClaw.
 
-export LLM_MODEL="gpt-4o"
-export RADWARE_USER_IDENTIFIER="openclaw-out-of-path"
-export RADWARE_FAIL_MODE="fail-close"
+If setup fails, the helper prints a short failure summary and writes a sanitized diagnostic log under the OpenClaw config directory, usually `~/.openclaw/logs/radware-openclaw-setup-<timestamp>.log`. The log includes versions, selected mode, config path, actions attempted, plugin-install output, and the error stack. It redacts API-key-looking values and does not include request payloads.
+
+Load the generated env file before starting OpenClaw:
+
+```bash
+set -a
+. ~/.openclaw/radware.env
+set +a
+openclaw gateway run --force
 ```
 
 ## Upgrade From 0.1.0
@@ -64,22 +69,26 @@ npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in
 or:
 
 ```bash
-openclaw plugins install openclaw-radware-agentic-protection@latest
+openclaw plugins install npm:openclaw-radware-agentic-protection@latest
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path
 ```
 
 ## Package Version Policy
 
-Use `openclaw-radware-agentic-protection@latest` for customer deployments. Version `0.1.4` and later include the production-safe deployment flow, foreground gateway guidance, and strict one-path-per-OpenClaw-deployment guardrails.
+Use `openclaw-radware-agentic-protection@latest` for customer deployments. Version `0.2.0` is the customer release version for the interactive wizard, full-stage out-of-path enforcement, diagnostics, foreground gateway guidance, and strict one-path-per-OpenClaw-deployment guardrails.
 
 Do not unpublish previous NPM versions as a normal maintenance action. Unpublishing can break pinned installs and those version numbers cannot be reused. If a previous version should no longer be used, deprecate it with an upgrade message instead:
 
 ```bash
-npm deprecate openclaw-radware-agentic-protection@"<0.1.4" \
-  "Please upgrade to 0.1.4 or later. Earlier versions were superseded by production-safe OpenClaw deployment guidance and stricter in-path/out-of-path validation."
+npm deprecate openclaw-radware-agentic-protection@"<0.2.0" \
+  "Please upgrade to 0.2.0 or later. Earlier versions were superseded by the interactive setup wizard, full-stage out-of-path enforcement, diagnostics, and stricter in-path/out-of-path validation."
 ```
 
 Deprecation preserves reproducibility for pinned users while showing a clear install-time warning.
+
+## Advanced Non-Interactive Setup
+
+Use these commands for automation or formal change control. The wizard above is the recommended customer path.
 
 ### In-Path Only
 
@@ -87,51 +96,89 @@ Deprecation preserves reproducibility for pinned users while showing a clear ins
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --set-default-model \
+  --runtime-env-file ~/.openclaw/radware.env \
   --dry-run
 
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
-  --set-default-model
+  --set-default-model \
+  --runtime-env-file ~/.openclaw/radware.env
 ```
 
-Restart OpenClaw with the environment variables loaded.
+Restart OpenClaw with the env file loaded.
 
-`openclaw gateway --force` is a foreground server process. Seeing `gateway] ready` means the gateway started successfully; the command is expected to keep running until stopped.
+`openclaw gateway run --force` is a foreground server process. Seeing `gateway] ready` means the gateway started successfully; the command is expected to keep running until stopped.
 
 ### Out-Of-Path Only
 
 ```bash
-openclaw plugins install openclaw-radware-agentic-protection@latest
+openclaw plugins install npm:openclaw-radware-agentic-protection@latest
 
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path \
+  --runtime-env-file ~/.openclaw/radware.env \
   --dry-run
 
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
-  --out-of-path
+  --out-of-path \
+  --runtime-env-file ~/.openclaw/radware.env
 ```
 
-Restart OpenClaw with the environment variables loaded, then inspect:
+Restart OpenClaw with the env file loaded, then inspect:
 
 ```bash
 openclaw plugins inspect radware-agentic --runtime --json
 ```
 
-`openclaw gateway --force` is a foreground server process. Seeing `gateway] ready` means the gateway started successfully; the command is expected to keep running until stopped.
+`openclaw gateway run --force` is a foreground server process. Seeing `gateway] ready` means the gateway started successfully; the command is expected to keep running until stopped.
+
+Out-of-path does not route model traffic through Radware and does not configure the customer's LLM endpoint. The plugin sends `ModelToUse` to Radware as context for the check; the customer's existing OpenClaw provider remains responsible for calling OpenAI, Gemini, NVIDIA, or any other OpenAI-compatible endpoint.
+
+## Provider Endpoint Notes
+
+In-path uses a Radware proxy endpoint that must match the provider configured in the Radware portal:
+
+```bash
+RADWARE_INPATH_BASE_URL="https://api.agentic.radwarecto.com/v1/<provider-path>"
+```
+
+Validated in-path provider path:
+
+- OpenAI: `https://api.agentic.radwarecto.com/v1/openai`
+
+Do not assume the path for other providers. In lab validation on 2026-06-29, direct Gemini and NVIDIA OpenAI-compatible endpoints worked, but the tested Radware Gemini in-path paths did not produce a working proxied Gemini request. Keep Gemini in-path as portal/Radware review until the correct Radware provider path is confirmed.
+
+Direct OpenAI-compatible provider endpoints that customers may already use in their normal OpenClaw provider:
+
+| Provider | Base URL | Example model |
+| --- | --- | --- |
+| Google Gemini | `https://generativelanguage.googleapis.com/v1beta/openai` | `gemini-2.5-flash` |
+| NVIDIA NIM / Nemotron | `https://integrate.api.nvidia.com/v1` | `nvidia/nemotron-3-nano-30b-a3b` |
 
 ## Portal Decision Modes
 
 The out-of-path plugin uses `enforcementMode: "portal-decision"`:
 
-- Block and Report: Radware returns `IsBlocked: true`; the plugin blocks the tool.
-- Report Only: Radware returns `IsBlocked: false`; the plugin allows the tool.
+- Block and Report: Radware returns `IsBlocked: true`; the plugin blocks the protected stage.
+- Report Only: Radware returns `IsBlocked: false`; the plugin allows the protected stage.
 
 Local `failMode` applies only when Radware is unavailable or returns an invalid response:
 
-- `fail-close`: block/pause the tool when Radware cannot be reached.
-- `fail-open`: allow the tool when Radware cannot be reached and rely on audit/logging.
+- `fail-close`: block/pause the protected stage when Radware cannot be reached.
+- `fail-open`: allow the protected stage when Radware cannot be reached and rely on audit/logging.
 
 In-path is fail-close by default because model traffic goes only through Radware. In-path fail-open requires an explicit customer fallback wrapper that retries the direct LLM provider only for connectivity failures, never for Radware policy blocks.
+
+## Diagnostics And Logs
+
+The setup helper keeps logs short on screen and detailed on disk:
+
+- Setup failure log: `~/.openclaw/logs/radware-openclaw-setup-<timestamp>.log`.
+- Optional explicit setup log: add `--log-file /path/to/radware-openclaw-setup.log`.
+- Out-of-path runtime log: when using the generated env file, runtime diagnostics are written to `~/.openclaw/logs/radware-agentic-runtime.jsonl`.
+- Gateway log: capture the OpenClaw gateway output through the customer's service manager, or run `openclaw gateway run --force 2>&1 | tee ~/.openclaw/logs/openclaw-gateway.log` during validation.
+
+Runtime diagnostics are sanitized. They include stage, endpoint host/path, model identifier, payload sizes, HTTP status, Event ID when present, and fail-open/fail-close decision. They do not include API keys, full prompts, tool arguments, or full model/provider payloads.
 
 ## Customer Validation
 
@@ -143,14 +190,14 @@ Minimum checks:
 - AI Guardrails credit-card PII: should follow portal policy.
 - HAPBlocker: should follow portal policy.
 - Blocked medical/medicine topic: should follow portal policy.
-- Behavioral tool/action attempt: use a low-risk test tool action. Out-of-path enforcement only runs when OpenClaw is about to execute a tool.
+- Behavioral tool/action attempt: use a low-risk test tool action.
 
 Recommended flow:
 
 1. Start the OpenClaw gateway and wait for `gateway] ready`.
 2. Send a benign prompt through the customer's normal OpenClaw channel or Control UI.
 3. Send the AI Guardrails prompts through the same channel and verify Radware portal events.
-4. For out-of-path Behavioral validation, trigger a real low-risk tool action. A chat-only prompt will not call the plugin.
+4. For out-of-path Behavioral validation, trigger a real low-risk tool action.
 5. For in-path Behavioral validation, make sure the provider request includes tool/action context. A normal chat prompt may only validate AI Guardrails.
 
 For in-path Behavioral tests, represent retrieved content as tool output, not as a `system` message. Use this Chat Completions shape:
