@@ -7,7 +7,7 @@
 - OpenClaw version tested: `2026.6.10`
 - Published package audited first: `openclaw-radware-agentic-protection@0.1.5`
 - Prepared package version after fixes: `0.2.0`
-- Recommendation: release `0.2.0` with the documented limitations; NPM publish and deprecation require an authenticated NPM session.
+- Recommendation: release `0.2.0` with the documented limitations. NPM publish and older-version deprecation were completed on 2026-06-29.
 
 ## Install Findings
 
@@ -87,4 +87,4 @@ Out-of-path checks were also tested with only `ModelToUse` changed while using t
 - Verify the out-of-path blocked-topic behavior in the Radware portal. The prompt-stage API call allowed the medical/medicine topic while in-path blocked it. This may be policy/stage behavior, but should be confirmed before publishing.
 - Confirm the Radware in-path provider path for Gemini before documenting Gemini in-path as supported. Direct Gemini is OpenAI-compatible, but the tested Radware Gemini in-path paths failed or routed to OpenAI.
 - Create and test an NVIDIA/Nemotron Radware in-path deployment before documenting NVIDIA in-path as supported.
-- Publish `0.2.0` to NPM and deprecate older versions after authenticating to the NPM registry. Push the repository and tag `v0.2.0`. Do not reuse `0.1.5`.
+- Published `0.2.0` to NPM and deprecated older versions. Push the final report update and tag `v0.2.0`. Do not reuse `0.1.5`.
