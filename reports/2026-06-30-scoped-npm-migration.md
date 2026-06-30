@@ -17,21 +17,11 @@
   - `npm view @radware/openclaw-radware-agentic-protection version` returns `0.2.2`.
   - `npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup --help` runs.
 - Deprecated `@radware/openclaw-radware-agentic-protection@0.2.1` because it was superseded during the scoped migration.
+- Deprecated all published legacy unscoped versions (`0.1.0` through `0.2.0`) with a migration message that points customers to `@radware/openclaw-radware-agentic-protection@latest`.
 
-## Not Completed
+## Legacy Package
 
-The legacy unscoped package was not deprecated because npm rejected the Radware scoped account as a non-owner:
-
-```text
-You do not have permission to publish "openclaw-radware-agentic-protection".
-```
-
-To complete the migration, add the Radware npm user as a maintainer of `openclaw-radware-agentic-protection` or run the deprecation from an npm account that already owns that package:
-
-```bash
-npm deprecate openclaw-radware-agentic-protection \
-  "This package moved to @radware/openclaw-radware-agentic-protection. Please install @radware/openclaw-radware-agentic-protection@latest."
-```
+The legacy unscoped package remains available only as a migration pointer. It is deprecated, but not unpublished, so users with pinned installs receive the migration warning without breaking reproducible builds.
 
 Do not unpublish or delete the legacy package as a normal maintenance action; keep it as a migration pointer for users with pinned installs.
 
@@ -45,3 +35,4 @@ Do not unpublish or delete the legacy package as a normal maintenance action; ke
 - `git diff --check`: PASS
 - Repo token scan: PASS, no npm token found
 - DOCX/PDF text check: PASS, scoped package and version `0.2.2` present, old NPM URL absent
+- Legacy package deprecation check: PASS, `openclaw-radware-agentic-protection@0.1.0`, `@0.1.5`, and `@0.2.0` report the migration warning
