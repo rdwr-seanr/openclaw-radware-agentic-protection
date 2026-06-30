@@ -62,7 +62,7 @@ Custom provider paths:
 Recommended wizard:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup
 ```
 
 Choose `in-path` when prompted.
@@ -70,14 +70,14 @@ Choose `in-path` when prompted.
 Manual or change-control setup:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --dry-run
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --runtime-env-file ~/.openclaw/radware.env
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --dry-run
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --runtime-env-file ~/.openclaw/radware.env
 ```
 
 For a custom Radware provider path in non-interactive setup:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --in-path-provider custom \
   --in-path-endpoint /v1/<provider-path> \
@@ -89,7 +89,7 @@ If OpenClaw uses a custom config path, add `--config /path/to/openclaw.json`.
 To also set OpenClaw's default model:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --set-default-model --runtime-env-file ~/.openclaw/radware.env
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --set-default-model --runtime-env-file ~/.openclaw/radware.env
 ```
 
 Load the generated env file before starting OpenClaw:

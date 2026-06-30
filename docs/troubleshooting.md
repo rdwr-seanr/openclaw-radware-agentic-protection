@@ -43,7 +43,7 @@ For any non-OpenAI provider, do not guess the Radware `/v1/<provider>` path. Con
 Run the helper as the same OS user that runs OpenClaw. If OpenClaw uses a custom home or config path, set `OPENCLAW_HOME` or pass `--config`:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path \
   --config /path/to/openclaw.json \
   --dry-run
@@ -60,7 +60,7 @@ If setup was run before OpenClaw onboarding and created a partial config, move t
 ```bash
 mv ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bad-partial
 openclaw onboard --mode local
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --help
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup --help
 ```
 
 ## Out-Of-Path Checks Run But LLM Calls Fail

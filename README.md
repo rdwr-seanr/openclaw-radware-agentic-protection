@@ -4,7 +4,7 @@ This repository provides a production-oriented OpenClaw integration for Radware 
 
 For customer deployment, use the NPM package. GitHub is for source review, detailed documentation, and advanced validation assets.
 
-Current customer release: `openclaw-radware-agentic-protection@0.2.0`. In install commands, `@latest` resolves to the current customer release.
+Current customer release: `@radware/openclaw-radware-agentic-protection@0.2.2`. In install commands, `@latest` resolves to the current customer release.
 
 It supports two deployment options. Choose exactly one option for a given OpenClaw deployment:
 
@@ -31,12 +31,12 @@ Run all commands as the same OS user that owns the OpenClaw config and runs the 
 Run the setup wizard:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup
 ```
 
 The wizard asks for the deployment type, Radware API key, Radware endpoint, model, OpenClaw config path, runtime env-file path, and whether to apply or dry-run. For out-of-path, it also asks for the portal user identifier, fail-open/fail-close behavior, and whether to install the OpenClaw plugin.
 
-The wizard pre-fills Radware endpoints, writes a backup of `openclaw.json`, and writes runtime variables to an env file with `0600` permissions. For out-of-path, plugin installation uses the deterministic OpenClaw source spec `npm:openclaw-radware-agentic-protection@latest`. It does not ask for the customer's LLM provider API key in out-of-path mode because that provider should already be configured in OpenClaw.
+The wizard pre-fills Radware endpoints, writes a backup of `openclaw.json`, and writes runtime variables to an env file with `0600` permissions. For out-of-path, plugin installation uses the deterministic OpenClaw source spec `npm:@radware/openclaw-radware-agentic-protection@latest`. It does not ask for the customer's LLM provider API key in out-of-path mode because that provider should already be configured in OpenClaw.
 
 If setup fails, the helper prints a short failure summary and writes a sanitized diagnostic log under the OpenClaw config directory, usually `~/.openclaw/logs/radware-openclaw-setup-<timestamp>.log`. The log includes versions, selected mode, config path, actions attempted, plugin-install output, and the error stack. It redacts API-key-looking values and does not include request payloads.
 
@@ -66,13 +66,13 @@ export LLM_MODEL="gpt-4o"
 ```
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --set-default-model \
   --runtime-env-file ~/.openclaw/radware.env \
   --dry-run
 
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --set-default-model \
   --runtime-env-file ~/.openclaw/radware.env
@@ -81,7 +81,7 @@ npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
 For a custom Radware provider path confirmed in the portal:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --in-path-provider custom \
   --in-path-endpoint /v1/<provider-path> \
@@ -106,14 +106,14 @@ export RADWARE_FAIL_MODE="fail-close"
 ```
 
 ```bash
-openclaw plugins install npm:openclaw-radware-agentic-protection@latest
+openclaw plugins install npm:@radware/openclaw-radware-agentic-protection@latest
 
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path \
   --runtime-env-file ~/.openclaw/radware.env \
   --dry-run
 
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path \
   --runtime-env-file ~/.openclaw/radware.env
 ```
@@ -226,6 +226,7 @@ For in-path Behavioral tests, represent retrieved content as tool output, not as
 - [Fail-open and fail-close](docs/fail-open-fail-close.md)
 - [Package version policy](docs/package-version-policy.md)
 - [Troubleshooting](docs/troubleshooting.md)
+- [Scoped NPM migration report](reports/2026-06-30-scoped-npm-migration.md)
 
 ## Security Notes
 

@@ -11,8 +11,8 @@ const RADWARE_INPATH_ORIGIN = "https://api.agentic.radwarecto.com";
 const DEFAULT_INPATH_PROVIDER = "openai";
 const DEFAULT_INPATH_BASE_URL = `${RADWARE_INPATH_ORIGIN}/v1/${DEFAULT_INPATH_PROVIDER}`;
 const DEFAULT_OUTPATH_URL = "https://api.agentic.radwarecto.com/llmp/digester/agentic-api";
-const PACKAGE_SPEC = "npm:openclaw-radware-agentic-protection@latest";
-const SETUP_VERSION = "0.2.0";
+const PACKAGE_SPEC = "npm:@radware/openclaw-radware-agentic-protection@latest";
+const SETUP_VERSION = "0.2.2";
 const INPATH_PROVIDER_PRESETS = {
   openai: {
     label: "OpenAI",

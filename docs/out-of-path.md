@@ -13,7 +13,7 @@ Assumption: OpenClaw is already installed, onboarded, and has an existing `openc
 ## Install
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup
 ```
 
 Choose `out-of-path` when prompted. The wizard can install the OpenClaw plugin, write a backup of `openclaw.json`, and write runtime variables to a chmod `600` env file.
@@ -21,7 +21,7 @@ Choose `out-of-path` when prompted. The wizard can install the OpenClaw plugin, 
 For manual plugin installation, use the deterministic NPM source spec:
 
 ```bash
-openclaw plugins install npm:openclaw-radware-agentic-protection@latest
+openclaw plugins install npm:@radware/openclaw-radware-agentic-protection@latest
 ```
 
 ## Configure
@@ -38,8 +38,8 @@ export RADWARE_AGENTIC_DIAGNOSTIC_LOG="$HOME/.openclaw/logs/radware-agentic-runt
 Use the setup helper:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path --dry-run
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path --runtime-env-file ~/.openclaw/radware.env
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path --dry-run
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path --runtime-env-file ~/.openclaw/radware.env
 ```
 
 If OpenClaw uses a custom config path, add `--config /path/to/openclaw.json`.

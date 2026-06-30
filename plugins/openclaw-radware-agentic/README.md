@@ -4,7 +4,7 @@ OpenClaw integration package for Radware Agentic AI Protection.
 
 Use this package when OpenClaw is already installed and running. The package does not install or onboard OpenClaw.
 
-Current customer release: `openclaw-radware-agentic-protection@0.2.0`. In install commands, `@latest` resolves to the current customer release.
+Current customer release: `@radware/openclaw-radware-agentic-protection@0.2.2`. In install commands, `@latest` resolves to the current customer release.
 
 ## What This Package Provides
 
@@ -38,7 +38,7 @@ Choose exactly one integration path for a given OpenClaw deployment. Do not conf
 Run the wizard as the same OS user that runs OpenClaw:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup
 ```
 
 The wizard asks for:
@@ -52,7 +52,7 @@ The wizard asks for:
 The wizard updates `openclaw.json`, writes a backup, writes the env file with `0600` permissions, and for out-of-path can install the plugin with:
 
 ```bash
-openclaw plugins install npm:openclaw-radware-agentic-protection@latest
+openclaw plugins install npm:@radware/openclaw-radware-agentic-protection@latest
 ```
 
 If setup fails, the helper prints the reason, suggested next checks, and the path to a sanitized diagnostic log. The default failure-log location is:
@@ -99,7 +99,7 @@ export LLM_MODEL="gpt-4o"
 Dry-run the change:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --set-default-model \
   --runtime-env-file ~/.openclaw/radware.env \
@@ -109,7 +109,7 @@ npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
 Apply the change:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --set-default-model \
   --runtime-env-file ~/.openclaw/radware.env
@@ -118,7 +118,7 @@ npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
 For a custom Radware provider path confirmed in the portal:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --in-path \
   --in-path-provider custom \
   --in-path-endpoint /v1/<provider-path> \
@@ -165,13 +165,13 @@ export RADWARE_FAIL_MODE="fail-close"
 Install the plugin:
 
 ```bash
-openclaw plugins install npm:openclaw-radware-agentic-protection@latest
+openclaw plugins install npm:@radware/openclaw-radware-agentic-protection@latest
 ```
 
 Dry-run the config merge:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path \
   --runtime-env-file ~/.openclaw/radware.env \
   --dry-run
@@ -180,7 +180,7 @@ npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
 Apply the config merge:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path \
   --runtime-env-file ~/.openclaw/radware.env
 ```
@@ -305,7 +305,7 @@ For each event, record:
 Run the helper as the same user that runs OpenClaw, or pass the exact config path:
 
 ```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+npx -y -p @radware/openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --out-of-path \
   --config /path/to/openclaw.json \
   --dry-run

@@ -2,7 +2,7 @@
   "id": "radware-agentic",
   "name": "Radware Agentic AI Protection",
   "description": "Enforces Radware Agentic AI Protection at OpenClaw prompt, response, and tool stages.",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "activation": {
     "onStartup": true
   },
