@@ -4,6 +4,8 @@ OpenClaw integration package for Radware Agentic AI Protection.
 
 Use this package when OpenClaw is already installed and running. The package does not install or onboard OpenClaw.
 
+Current customer release: `openclaw-radware-agentic-protection@0.2.0`. In install commands, `@latest` resolves to the current customer release.
+
 ## What This Package Provides
 
 - **Out-of-path enforcement plugin**: registers OpenClaw lifecycle hooks and calls Radware for prompt, response, and tool-stage checks in new setup-generated configs.
@@ -28,47 +30,6 @@ If OpenClaw uses a custom config path, pass it with `--config /path/to/openclaw.
 The setup wizard can write runtime secrets to a chmod `600` env file. Do not write real keys into `openclaw.json`.
 
 Out-of-path deployments keep the customer's existing OpenClaw LLM provider. This package does not ask for, store, or change the customer's OpenAI, Gemini, NVIDIA, or other provider API key.
-
-## Upgrade From 0.1.0
-
-Version `0.1.1` and later are production-safe by default:
-
-- The setup helper expects an existing onboarded OpenClaw config.
-- The setup helper refuses `--in-path --out-of-path` and also refuses adding one Radware path to a config that already contains the other Radware path.
-- The docs present in-path and out-of-path as mutually exclusive deployment options.
-
-If you previously ran the `0.1.0` setup helper on a fresh server before OpenClaw onboarding, it may have created a partial `openclaw.json`. If OpenClaw reports `existing config is missing gateway.mode`, move that partial file aside and onboard OpenClaw first:
-
-```bash
-mv ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bad-partial
-openclaw onboard --mode local
-```
-
-Then rerun setup with the latest package and choose exactly one path:
-
-```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --set-default-model
-```
-
-or:
-
-```bash
-openclaw plugins install npm:openclaw-radware-agentic-protection@latest
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path
-```
-
-## Package Version Policy
-
-Use `openclaw-radware-agentic-protection@latest` for customer deployments. Version `0.2.0` is the customer release version for the interactive wizard, full-stage out-of-path enforcement, diagnostics, foreground gateway guidance, and strict one-path-per-OpenClaw-deployment guardrails.
-
-Do not unpublish previous NPM versions as a normal maintenance action. Unpublishing can break pinned installs and those version numbers cannot be reused. If a previous version should no longer be used, deprecate it with an upgrade message instead:
-
-```bash
-npm deprecate openclaw-radware-agentic-protection@"<0.2.0" \
-  "Please upgrade to 0.2.0 or later. Earlier versions were superseded by the interactive setup wizard, full-stage out-of-path enforcement, diagnostics, and stricter in-path/out-of-path validation."
-```
-
-Deprecation preserves reproducibility for pinned users while showing a clear install-time warning.
 
 ## Easy Setup
 
@@ -119,9 +80,21 @@ openclaw gateway run --force
 
 ## Advanced Setup
 
+Use this section for automation or formal change control. The interactive wizard above is the recommended customer path.
+
+Before applying a non-interactive setup, export the relevant Radware values in the shell or service environment. The setup helper writes references to environment variables in `openclaw.json`; it never writes raw secrets there.
+
 ### Option A: In-Path Only
 
 Use in-path when Radware should sit inline on OpenClaw provider traffic.
+
+Set the Radware in-path values first:
+
+```bash
+export RADWARE_INPATH_API_KEY="sk-rdwr-..."
+export RADWARE_INPATH_BASE_URL="https://api.agentic.radwarecto.com/v1/openai"
+export LLM_MODEL="gpt-4o"
+```
 
 Dry-run the change:
 
@@ -165,6 +138,16 @@ Restart the OpenClaw gateway with the env file loaded.
 Use out-of-path when the customer wants to keep the existing OpenClaw LLM provider and have Radware check prompt, response, and tool stages explicitly.
 
 Out-of-path does not route model traffic through Radware. The plugin sends the model identifier to Radware as `ModelToUse` for context, while OpenClaw continues calling the customer's configured provider endpoint.
+
+Set the Radware out-of-path values first. Keep the customer's normal LLM provider key in the existing OpenClaw provider configuration.
+
+```bash
+export RADWARE_OUT_OF_PATH_API_KEY="sk-rdwr-..."
+export RADWARE_OUT_OF_PATH_URL="https://api.agentic.radwarecto.com/llmp/digester/agentic-api"
+export LLM_MODEL="gpt-4o"
+export RADWARE_USER_IDENTIFIER="openclaw-out-of-path"
+export RADWARE_FAIL_MODE="fail-close"
+```
 
 Install the plugin:
 

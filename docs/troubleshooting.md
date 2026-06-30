@@ -55,7 +55,7 @@ The helper expects an existing, onboarded OpenClaw config. This usually means Op
 
 For production, do not let the helper create a new OpenClaw config from scratch. Run it against the existing customer config.
 
-If this happened in a fresh lab after running version `0.1.0`, move the partial config aside, onboard OpenClaw, and rerun the latest setup helper:
+If setup was run before OpenClaw onboarding and created a partial config, move the partial config aside, onboard OpenClaw, and rerun the latest setup helper:
 
 ```bash
 mv ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bad-partial

@@ -2,7 +2,7 @@
 
 Use `openclaw-radware-agentic-protection@latest` for customer deployments.
 
-Version `0.2.0` is the customer release version. It includes:
+Version `0.2.0` is the current customer release. It includes:
 
 - An existing OpenClaw config requirement by default.
 - A strict choice of exactly one integration path per OpenClaw deployment.
@@ -11,7 +11,7 @@ Version `0.2.0` is the customer release version. It includes:
 - Clear guidance that `openclaw gateway run --force` is a foreground process and `gateway] ready` means startup succeeded.
 - The interactive setup wizard, env-file writing, deterministic `npm:` plugin install guidance, full-stage out-of-path config, and sanitized diagnostics.
 
-Release validation has been completed. Publish `0.2.0` only from an authenticated NPM session and tag the matching Git commit as `v0.2.0`.
+Release validation has been completed. NPM `latest` points to `0.2.0`, and the matching Git tag is `v0.2.0`.
 
 ## Do Not Unpublish Normal Superseded Versions
 

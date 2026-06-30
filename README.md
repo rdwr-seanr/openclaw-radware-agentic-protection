@@ -4,6 +4,8 @@ This repository provides a production-oriented OpenClaw integration for Radware 
 
 For customer deployment, use the NPM package. GitHub is for source review, detailed documentation, and advanced validation assets.
 
+Current customer release: `openclaw-radware-agentic-protection@0.2.0`. In install commands, `@latest` resolves to the current customer release.
+
 It supports two deployment options. Choose exactly one option for a given OpenClaw deployment:
 
 - In-path / inline protection: route OpenClaw provider traffic through Radware's OpenAI-compatible proxy, including prompt, response, and tool-call context when OpenClaw sends that context through the provider request.
@@ -20,19 +22,21 @@ Each deployment type can support AI Guardrails and Behavioral / Agentic Protecti
 
 Do not store keys in `openclaw.json`, Git, screenshots, validation reports, or logs. Use runtime environment variables, a secret manager, or the setup-generated chmod `600` env file.
 
-## Customer Deployment
+## One-Command Customer Setup
 
 Assumption: OpenClaw is already installed, onboarded, and has a valid `openclaw.json`.
 
 Run all commands as the same OS user that owns the OpenClaw config and runs the OpenClaw gateway. If OpenClaw uses a custom config path, pass `--config /path/to/openclaw.json`.
 
-For the easiest installation, run the setup wizard:
+Run the setup wizard:
 
 ```bash
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup
 ```
 
-The wizard asks which deployment type to configure, pre-fills the Radware endpoints, writes a backup of `openclaw.json`, and writes runtime variables to an env file with `0600` permissions. For out-of-path, it can also install the plugin with the deterministic OpenClaw source spec `npm:openclaw-radware-agentic-protection@latest`. It does not ask for the customer's LLM provider API key in out-of-path mode because that provider should already be configured in OpenClaw.
+The wizard asks for the deployment type, Radware API key, Radware endpoint, model, OpenClaw config path, runtime env-file path, and whether to apply or dry-run. For out-of-path, it also asks for the portal user identifier, fail-open/fail-close behavior, and whether to install the OpenClaw plugin.
+
+The wizard pre-fills Radware endpoints, writes a backup of `openclaw.json`, and writes runtime variables to an env file with `0600` permissions. For out-of-path, plugin installation uses the deterministic OpenClaw source spec `npm:openclaw-radware-agentic-protection@latest`. It does not ask for the customer's LLM provider API key in out-of-path mode because that provider should already be configured in OpenClaw.
 
 If setup fails, the helper prints a short failure summary and writes a sanitized diagnostic log under the OpenClaw config directory, usually `~/.openclaw/logs/radware-openclaw-setup-<timestamp>.log`. The log includes versions, selected mode, config path, actions attempted, plugin-install output, and the error stack. It redacts API-key-looking values and does not include request payloads.
 
@@ -45,52 +49,21 @@ set +a
 openclaw gateway run --force
 ```
 
-## Upgrade From 0.1.0
-
-Version `0.1.1` and later are production-safe by default:
-
-- The setup helper expects an existing onboarded OpenClaw config.
-- The setup helper refuses `--in-path --out-of-path` and also refuses adding one Radware path to a config that already contains the other Radware path.
-- The docs present in-path and out-of-path as mutually exclusive deployment options.
-
-If you previously ran the `0.1.0` setup helper on a fresh server before OpenClaw onboarding, it may have created a partial `openclaw.json`. If OpenClaw reports `existing config is missing gateway.mode`, move that partial file aside and onboard OpenClaw first:
-
-```bash
-mv ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bad-partial
-openclaw onboard --mode local
-```
-
-Then rerun setup with the latest package and choose exactly one path:
-
-```bash
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --set-default-model
-```
-
-or:
-
-```bash
-openclaw plugins install npm:openclaw-radware-agentic-protection@latest
-npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --out-of-path
-```
-
-## Package Version Policy
-
-Use `openclaw-radware-agentic-protection@latest` for customer deployments. Version `0.2.0` is the customer release version for the interactive wizard, full-stage out-of-path enforcement, diagnostics, foreground gateway guidance, and strict one-path-per-OpenClaw-deployment guardrails.
-
-Do not unpublish previous NPM versions as a normal maintenance action. Unpublishing can break pinned installs and those version numbers cannot be reused. If a previous version should no longer be used, deprecate it with an upgrade message instead:
-
-```bash
-npm deprecate openclaw-radware-agentic-protection@"<0.2.0" \
-  "Please upgrade to 0.2.0 or later. Earlier versions were superseded by the interactive setup wizard, full-stage out-of-path enforcement, diagnostics, and stricter in-path/out-of-path validation."
-```
-
-Deprecation preserves reproducibility for pinned users while showing a clear install-time warning.
-
 ## Advanced Non-Interactive Setup
 
 Use these commands for automation or formal change control. The wizard above is the recommended customer path.
 
+Before applying a non-interactive setup, export the relevant Radware values in the shell or service environment. The setup helper writes references to environment variables in `openclaw.json`; it never writes raw secrets there.
+
 ### In-Path Only
+
+Set the Radware in-path values first:
+
+```bash
+export RADWARE_INPATH_API_KEY="sk-rdwr-..."
+export RADWARE_INPATH_BASE_URL="https://api.agentic.radwarecto.com/v1/openai"
+export LLM_MODEL="gpt-4o"
+```
 
 ```bash
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
@@ -110,6 +83,16 @@ Restart OpenClaw with the env file loaded.
 `openclaw gateway run --force` is a foreground server process. Seeing `gateway] ready` means the gateway started successfully; the command is expected to keep running until stopped.
 
 ### Out-Of-Path Only
+
+Set the Radware out-of-path values first. Keep the customer's normal LLM provider key in the existing OpenClaw provider configuration.
+
+```bash
+export RADWARE_OUT_OF_PATH_API_KEY="sk-rdwr-..."
+export RADWARE_OUT_OF_PATH_URL="https://api.agentic.radwarecto.com/llmp/digester/agentic-api"
+export LLM_MODEL="gpt-4o"
+export RADWARE_USER_IDENTIFIER="openclaw-out-of-path"
+export RADWARE_FAIL_MODE="fail-close"
+```
 
 ```bash
 openclaw plugins install npm:openclaw-radware-agentic-protection@latest
@@ -237,7 +220,7 @@ For in-path Behavioral tests, represent retrieved content as tool output, not as
 - [Fail-open and fail-close](docs/fail-open-fail-close.md)
 - [Package version policy](docs/package-version-policy.md)
 - [Troubleshooting](docs/troubleshooting.md)
-- [Validation report](reports/2026-05-25-validation-report.md)
+- [Install audit and validation report](reports/2026-06-29-install-audit-report.md)
 
 ## Security Notes
 
