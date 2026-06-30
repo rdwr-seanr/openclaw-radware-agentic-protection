@@ -46,14 +46,7 @@ If OpenClaw uses a custom config path, add `--config /path/to/openclaw.json`.
 
 The setup helper edits only the Radware plugin entry and preserves existing OpenClaw channels, agents, tools, and model providers.
 
-Out-of-path does not proxy or replace the LLM call. OpenClaw continues to call the customer's configured model provider, such as OpenAI, Gemini, NVIDIA, or another OpenAI-compatible endpoint. The plugin only sends the model identifier to Radware as `ModelToUse` so the Radware event has model context.
-
-Examples of direct OpenAI-compatible provider endpoints that customers may already have configured:
-
-| Provider | Base URL | Example model |
-| --- | --- | --- |
-| Google Gemini | `https://generativelanguage.googleapis.com/v1beta/openai` | `gemini-2.5-flash` |
-| NVIDIA NIM / Nemotron | `https://integrate.api.nvidia.com/v1` | `nvidia/nemotron-3-nano-30b-a3b` |
+Out-of-path does not proxy or replace the LLM call. OpenClaw continues to call the customer's configured model provider. The plugin only sends the model identifier to Radware as `ModelToUse` so the Radware event has model context.
 
 ## What The Plugin Sends
 

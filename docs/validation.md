@@ -33,7 +33,7 @@ If an out-of-path prompt-stage blocked-topic test is allowed but the equivalent 
 
 In-path Behavioral validation requires the provider request to include tool/action context. A simple chat prompt may exercise AI Guardrails but not Behavioral / Agentic Protection.
 
-For non-OpenAI providers, validate the customer's direct OpenAI-compatible endpoint separately from Radware in-path routing. For example, Gemini may use `https://generativelanguage.googleapis.com/v1beta/openai` and NVIDIA may use `https://integrate.api.nvidia.com/v1` as the customer's normal OpenClaw provider in out-of-path mode. These direct endpoints do not prove the Radware in-path `/v1/<provider>` route; that route must be confirmed against the Radware portal deployment.
+For non-OpenAI providers, validate the customer's direct LLM endpoint separately from Radware in-path routing. A direct provider endpoint does not prove the Radware in-path `/v1/<provider>` route; that route must be confirmed against the Radware portal deployment.
 
 ## Advanced Radware Validation Scripts
 

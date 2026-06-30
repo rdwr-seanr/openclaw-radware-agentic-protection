@@ -11,7 +11,7 @@ Use the Radware Agentic AI Protection portal to create the protections before co
 5. Paste it into the setup wizard, or set it at runtime as `RADWARE_INPATH_API_KEY`.
 6. Use the Radware in-path endpoint as `RADWARE_INPATH_BASE_URL`.
 
-OpenClaw must use the Radware in-path API key as the model-provider API key. Do not put the customer OpenAI API key in the Radware in-path provider entry.
+OpenClaw must use the Radware in-path API key as the model-provider API key. Do not put the customer's direct LLM provider key in the Radware in-path provider entry.
 
 The Radware in-path endpoint must match the provider configured in the portal. The validated OpenAI endpoint is:
 
@@ -19,7 +19,7 @@ The Radware in-path endpoint must match the provider configured in the portal. T
 https://api.agentic.radwarecto.com/v1/openai
 ```
 
-Other providers need a confirmed Radware provider path before they are documented as supported. Direct Gemini and NVIDIA OpenAI-compatible endpoints worked in lab testing, but Radware Gemini in-path did not work with the tested candidate paths on 2026-06-29 and needs portal/Radware review.
+For any other provider, choose `custom` in the setup wizard and enter the Radware provider path confirmed in the portal. Use only the Radware proxy endpoint, not the direct LLM provider base URL.
 
 ## Out-Of-Path Protection
 
@@ -32,7 +32,7 @@ Other providers need a confirmed Radware provider path before they are documente
 
 The included out-of-path plugin sends explicit checks to Radware at the stages enabled in plugin config. New setup-generated configs enable prompt, response, and tool checks. Existing configs without `stages` remain tool-stage only. Out-of-path does not replace the customer's normal LLM provider.
 
-Because out-of-path does not proxy model traffic, the setup wizard does not ask for the customer's OpenAI, Gemini, NVIDIA, or other LLM provider key. The customer's normal OpenClaw provider continues to own that endpoint and credential.
+Because out-of-path does not proxy model traffic, the setup wizard does not ask for the customer's LLM provider key. The customer's normal OpenClaw provider continues to own that endpoint and credential.
 
 ## Policy Modes
 

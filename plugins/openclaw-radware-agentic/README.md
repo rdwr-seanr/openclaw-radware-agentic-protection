@@ -29,7 +29,7 @@ If OpenClaw uses a custom config path, pass it with `--config /path/to/openclaw.
 
 The setup wizard can write runtime secrets to a chmod `600` env file. Do not write real keys into `openclaw.json`.
 
-Out-of-path deployments keep the customer's existing OpenClaw LLM provider. This package does not ask for, store, or change the customer's OpenAI, Gemini, NVIDIA, or other provider API key.
+Out-of-path deployments keep the customer's existing OpenClaw LLM provider. This package does not ask for, store, or change the customer's LLM provider API key.
 
 ## Easy Setup
 
@@ -115,13 +115,24 @@ npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
   --runtime-env-file ~/.openclaw/radware.env
 ```
 
-This adds a provider named `radware-openai` that uses:
+For a custom Radware provider path confirmed in the portal:
+
+```bash
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+  --in-path \
+  --in-path-provider custom \
+  --in-path-endpoint /v1/<provider-path> \
+  --set-default-model \
+  --runtime-env-file ~/.openclaw/radware.env
+```
+
+The OpenAI preset adds a provider named `radware-openai`. A custom in-path provider defaults to `radware-inpath` unless `--provider-name` is set. The provider uses:
 
 - `apiKey`: `${RADWARE_INPATH_API_KEY}`
 - `baseUrl`: `${RADWARE_INPATH_BASE_URL}`
 - model: `${LLM_MODEL}` or `gpt-4o`
 
-The customer OpenAI API key is not used by this in-path provider entry.
+The customer's direct LLM provider key is not used by this in-path provider entry.
 
 The Radware in-path base URL must match the provider configured in the Radware portal. OpenAI was validated with:
 
@@ -129,7 +140,9 @@ The Radware in-path base URL must match the provider configured in the Radware p
 RADWARE_INPATH_BASE_URL="https://api.agentic.radwarecto.com/v1/openai"
 ```
 
-Do not assume another Radware provider path without testing it. On 2026-06-29, direct Gemini and NVIDIA OpenAI-compatible endpoints worked, but the tested Radware Gemini in-path paths did not produce a working proxied Gemini request.
+For any other in-path provider, choose `custom` in the setup wizard and enter the Radware provider path confirmed in the Radware portal. The helper accepts a full Radware URL, a path such as `/v1/<provider-path>`, or a short provider path such as `<provider-path>` and normalizes path inputs under `https://api.agentic.radwarecto.com`.
+
+Do not use the direct LLM provider base URL as `RADWARE_INPATH_BASE_URL`. In-path must use a Radware proxy endpoint.
 
 Restart the OpenClaw gateway with the env file loaded.
 
@@ -214,12 +227,7 @@ Inspect the plugin:
 openclaw plugins inspect radware-agentic --runtime --json
 ```
 
-Common direct OpenAI-compatible provider base URLs customers may already have in their normal OpenClaw provider are:
-
-| Provider | Base URL | Example model |
-| --- | --- | --- |
-| Google Gemini | `https://generativelanguage.googleapis.com/v1beta/openai` | `gemini-2.5-flash` |
-| NVIDIA NIM / Nemotron | `https://integrate.api.nvidia.com/v1` | `nvidia/nemotron-3-nano-30b-a3b` |
+The customer's existing OpenClaw provider configuration owns the direct LLM endpoint and provider credential.
 
 ## Manual Change-Control Installation
 

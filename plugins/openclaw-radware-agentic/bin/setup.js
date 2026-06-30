@@ -7,10 +7,19 @@ import path from "node:path";
 import process from "node:process";
 import { createInterface } from "node:readline/promises";
 
-const DEFAULT_INPATH_BASE_URL = "https://api.agentic.radwarecto.com/v1/openai";
+const RADWARE_INPATH_ORIGIN = "https://api.agentic.radwarecto.com";
+const DEFAULT_INPATH_PROVIDER = "openai";
+const DEFAULT_INPATH_BASE_URL = `${RADWARE_INPATH_ORIGIN}/v1/${DEFAULT_INPATH_PROVIDER}`;
 const DEFAULT_OUTPATH_URL = "https://api.agentic.radwarecto.com/llmp/digester/agentic-api";
 const PACKAGE_SPEC = "npm:openclaw-radware-agentic-protection@latest";
 const SETUP_VERSION = "0.2.0";
+const INPATH_PROVIDER_PRESETS = {
+  openai: {
+    label: "OpenAI",
+    providerName: "radware-openai",
+    endpoint: DEFAULT_INPATH_BASE_URL,
+  },
+};
 
 function usage(exitCode = 0) {
   console.log(`Radware OpenClaw setup
@@ -27,7 +36,9 @@ Integration path:
 
 Options:
   --config <path>           OpenClaw config path. Defaults to OPENCLAW_HOME/.openclaw/openclaw.json or ~/.openclaw/openclaw.json.
-  --provider-name <name>    In-path provider name. Default: radware-openai.
+  --provider-name <name>    In-path provider name. Default: radware-openai for OpenAI, radware-inpath for custom.
+  --in-path-provider <id>   In-path provider preset: openai or custom. Default: openai.
+  --in-path-endpoint <url>  In-path Radware endpoint or path. Accepts full URL, /v1/<path>, or <path>.
   --model <id>              Model id to configure/use. Default: gpt-4o.
   --set-default-model       Set agents.defaults.model.primary to the Radware in-path provider.
   --user-identifier <id>    Out-of-path Radware UserIdentifier. Default: openclaw-out-of-path.
@@ -49,6 +60,9 @@ Out-of-path setup does not configure the customer's LLM provider or ask for the 
 Keep the customer's existing OpenClaw model provider configured separately.
 
 On failure, setup writes a sanitized diagnostic log and prints the log path.
+
+For in-path custom providers, use the Radware proxy path confirmed in the Radware portal.
+Do not use the direct LLM provider base URL as RADWARE_INPATH_BASE_URL.
 `);
   process.exit(exitCode);
 }
@@ -58,7 +72,11 @@ function parseArgs(argv) {
     inPath: false,
     outOfPath: false,
     configPath: "",
-    providerName: "radware-openai",
+    providerName: "",
+    providerNameExplicit: false,
+    inPathProvider: DEFAULT_INPATH_PROVIDER,
+    inPathEndpoint: process.env.RADWARE_INPATH_BASE_URL || "",
+    inPathProviderLabel: INPATH_PROVIDER_PRESETS[DEFAULT_INPATH_PROVIDER].label,
     model: process.env.LLM_MODEL || "gpt-4o",
     setDefaultModel: false,
     userIdentifier: process.env.RADWARE_USER_IDENTIFIER || "openclaw-out-of-path",
@@ -96,6 +114,15 @@ function parseArgs(argv) {
         break;
       case "--provider-name":
         args.providerName = next();
+        args.providerNameExplicit = true;
+        break;
+      case "--in-path-provider":
+        args.inPathProvider = next();
+        break;
+      case "--in-path-endpoint":
+      case "--in-path-provider-path":
+      case "--radware-in-path-endpoint":
+        args.inPathEndpoint = next();
         break;
       case "--model":
         args.model = next();
@@ -171,6 +198,58 @@ function expandHome(value) {
     return path.join(os.homedir(), value.slice(2));
   }
   return value;
+}
+
+function normalizeInPathProvider(value) {
+  const normalized = String(value || DEFAULT_INPATH_PROVIDER).trim().toLowerCase().replace(/_/g, "-");
+  if (INPATH_PROVIDER_PRESETS[normalized]) {
+    return normalized;
+  }
+  if (["custom", "other", "own", "manual"].includes(normalized)) {
+    return "custom";
+  }
+  throw new Error("--in-path-provider must be openai or custom");
+}
+
+function normalizeInPathEndpoint(value, provider) {
+  const raw = String(value || "").trim();
+  if (!raw) {
+    if (provider === "custom") {
+      throw new Error("Custom in-path provider requires --in-path-endpoint or a RADWARE_INPATH_BASE_URL value");
+    }
+    return INPATH_PROVIDER_PRESETS[provider]?.endpoint || DEFAULT_INPATH_BASE_URL;
+  }
+  if (/^https?:\/\//i.test(raw)) {
+    return raw.replace(/\/+$/, "");
+  }
+  if (raw.startsWith("/")) {
+    return `${RADWARE_INPATH_ORIGIN}${raw.replace(/\/+$/, "")}`;
+  }
+  if (raw.startsWith("v1/")) {
+    return `${RADWARE_INPATH_ORIGIN}/${raw.replace(/\/+$/, "")}`;
+  }
+  return `${RADWARE_INPATH_ORIGIN}/v1/${raw.replace(/^\/+|\/+$/g, "")}`;
+}
+
+function defaultProviderName(args) {
+  if (args.providerNameExplicit && args.providerName) {
+    return args.providerName;
+  }
+  const preset = INPATH_PROVIDER_PRESETS[args.inPathProvider];
+  return preset?.providerName || "radware-inpath";
+}
+
+function prepareInPathArgs(args) {
+  if (!args.inPath) {
+    return args;
+  }
+  args.inPathProvider = normalizeInPathProvider(args.inPathProvider);
+  args.inPathEndpoint = normalizeInPathEndpoint(args.inPathEndpoint, args.inPathProvider);
+  process.env.RADWARE_INPATH_BASE_URL = args.inPathEndpoint;
+  args.inPathProviderLabel =
+    INPATH_PROVIDER_PRESETS[args.inPathProvider]?.label || "Custom LLM";
+  args.providerName = defaultProviderName(args);
+  return args;
 }
 
 function quoteEnv(value) {
@@ -437,11 +516,23 @@ async function completeInteractiveArgs(args) {
     args.model = await askLine(rl, "Model", args.model);
 
     if (args.inPath) {
-      process.env.RADWARE_INPATH_BASE_URL = await askLine(
-        rl,
-        "Radware in-path endpoint",
-        process.env.RADWARE_INPATH_BASE_URL || DEFAULT_INPATH_BASE_URL,
+      args.inPathProvider = normalizeInPathProvider(
+        await askLine(
+          rl,
+          "Radware in-path provider preset: openai or custom",
+          args.inPathProvider || DEFAULT_INPATH_PROVIDER,
+        ),
       );
+      const endpointPrompt =
+        args.inPathProvider === "custom"
+          ? "Custom Radware in-path endpoint or provider path"
+          : "Radware OpenAI in-path endpoint";
+      const endpointFallback =
+        args.inPathProvider === "custom"
+          ? process.env.RADWARE_INPATH_BASE_URL || ""
+          : process.env.RADWARE_INPATH_BASE_URL || DEFAULT_INPATH_BASE_URL;
+      args.inPathEndpoint = await askLine(rl, endpointPrompt, endpointFallback);
+      prepareInPathArgs(args);
       process.env.RADWARE_INPATH_API_KEY = await askSecret(
         "Radware in-path API key",
         process.env.RADWARE_INPATH_API_KEY || "",
@@ -491,7 +582,7 @@ function addInPath(config, args) {
     models: [
       {
         id: args.model,
-        name: `Radware-proxied OpenAI ${args.model}`,
+        name: `Radware-proxied ${args.inPathProviderLabel} ${args.model}`,
         api: "openai-completions",
         reasoning: false,
         input: ["text"],
@@ -541,7 +632,7 @@ async function writeRuntimeEnvFile(args, envFile) {
   if (args.inPath) {
     lines.push(
       `RADWARE_INPATH_API_KEY=${quoteEnv(process.env.RADWARE_INPATH_API_KEY || "")}`,
-      `RADWARE_INPATH_BASE_URL=${quoteEnv(process.env.RADWARE_INPATH_BASE_URL || DEFAULT_INPATH_BASE_URL)}`,
+      `RADWARE_INPATH_BASE_URL=${quoteEnv(args.inPathEndpoint || process.env.RADWARE_INPATH_BASE_URL || DEFAULT_INPATH_BASE_URL)}`,
       `LLM_MODEL=${quoteEnv(args.model)}`,
       `RADWARE_INPATH_USER_IDENTIFIER=${quoteEnv(process.env.RADWARE_INPATH_USER_IDENTIFIER || "openclaw-in-path")}`,
     );
@@ -630,7 +721,7 @@ async function loadConfig(configPath) {
     );
   }
   const content = await readFile(configPath, "utf8");
-  return JSON.parse(content);
+  return JSON.parse(content.replace(/^\uFEFF/, ""));
 }
 
 function validateExistingConfig(config, configPath, args) {
@@ -684,7 +775,7 @@ try {
     argv: process.argv.slice(2),
     runtime: runtimeSummary(),
   });
-  const args = await completeInteractiveArgs(parseArgs(process.argv.slice(2)));
+  const args = prepareInPathArgs(await completeInteractiveArgs(parseArgs(process.argv.slice(2))));
   const configPath = path.resolve(expandHome(args.configPath || defaultConfigPath()));
   configPathForFailure = configPath;
   const envFile = path.resolve(expandHome(args.envFile || defaultEnvFile(configPath)));
@@ -696,6 +787,9 @@ try {
     envFile,
     logFile,
     providerName: args.providerName,
+    inPathProvider: args.inPathProvider,
+    inPathProviderLabel: args.inPathProviderLabel,
+    inPathEndpoint: args.inPathEndpoint,
     model: args.model,
     setDefaultModel: args.setDefaultModel,
     userIdentifier: args.userIdentifier,
@@ -718,6 +812,9 @@ try {
     addInPath(config, args);
     diagnostics.add("in_path_config_merged", {
       providerName: args.providerName,
+      inPathProvider: args.inPathProvider,
+      inPathProviderLabel: args.inPathProviderLabel,
+      inPathEndpoint: args.inPathEndpoint,
       model: args.model,
       setDefaultModel: args.setDefaultModel,
     });
@@ -776,7 +873,7 @@ try {
   }
   console.log("Next steps:");
   if (args.inPath) {
-    console.log(`- Export RADWARE_INPATH_API_KEY and RADWARE_INPATH_BASE_URL=${DEFAULT_INPATH_BASE_URL}`);
+    console.log(`- Export RADWARE_INPATH_API_KEY and RADWARE_INPATH_BASE_URL=${args.inPathEndpoint || DEFAULT_INPATH_BASE_URL}`);
   }
   if (args.outOfPath) {
     console.log(`- Export RADWARE_OUT_OF_PATH_API_KEY and RADWARE_OUT_OF_PATH_URL=${DEFAULT_OUTPATH_URL}`);

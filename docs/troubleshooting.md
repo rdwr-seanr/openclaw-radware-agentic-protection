@@ -28,7 +28,7 @@ openclaw gateway run --force 2>&1 | tee ~/.openclaw/logs/openclaw-gateway.log
 
 ## In-Path Requests Fail Immediately
 
-Check that the OpenClaw provider uses the Radware in-path API key and Radware in-path base URL. Do not use the customer's OpenAI API key in the Radware in-path provider entry.
+Check that the OpenClaw provider uses the Radware in-path API key and Radware in-path base URL. Do not use the customer's direct LLM provider key in the Radware in-path provider entry.
 
 For OpenAI in-path, use the validated Radware endpoint:
 
@@ -36,7 +36,7 @@ For OpenAI in-path, use the validated Radware endpoint:
 https://api.agentic.radwarecto.com/v1/openai
 ```
 
-For Gemini, NVIDIA, or another provider, do not guess the Radware `/v1/<provider>` path. On 2026-06-29, direct Gemini and NVIDIA OpenAI-compatible endpoints worked, but the tested Radware Gemini in-path paths did not produce a valid proxied Gemini response. Confirm the provider path in the Radware portal or with Radware support before using it in production docs.
+For any non-OpenAI provider, do not guess the Radware `/v1/<provider>` path. Confirm the provider path in the Radware portal or with Radware support before using it in production docs. The direct LLM provider base URL is not valid as `RADWARE_INPATH_BASE_URL`.
 
 ## Setup Helper Says Config Is Missing
 

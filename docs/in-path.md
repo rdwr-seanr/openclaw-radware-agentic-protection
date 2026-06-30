@@ -9,9 +9,9 @@ Assumption: OpenClaw is already installed, onboarded, and has an existing `openc
 - `RADWARE_INPATH_API_KEY`: Radware in-path API key.
 - `RADWARE_INPATH_BASE_URL`: Radware in-path endpoint, for example `https://api.agentic.radwarecto.com/v1/openai`.
 
-The OpenClaw provider API key must be the Radware in-path key. The customer OpenAI key is not used by this provider entry.
+The OpenClaw provider API key must be the Radware in-path key. The customer's direct LLM provider key is not used by this provider entry.
 
-The endpoint path after `/v1/` must match the provider configured in the Radware portal. OpenAI has been validated with `/v1/openai`. Do not change this to `/v1/gemini`, `/v1/google`, or another provider path unless Radware confirms and validates that path for the customer's portal deployment.
+The endpoint path after `/v1/` must match the provider configured in the Radware portal. OpenAI has been validated with `/v1/openai`. For any other provider, use only the Radware provider path confirmed in the Radware portal for that customer deployment.
 
 ## Provider Path Notes
 
@@ -21,11 +21,12 @@ Validated Radware in-path endpoint:
 | --- | --- | --- | --- |
 | OpenAI | `https://api.agentic.radwarecto.com/v1/openai` | `gpt-4o` | Validated |
 
-Provider checks from 2026-06-29:
+Custom provider paths:
 
-- Direct Gemini OpenAI-compatible API worked at `https://generativelanguage.googleapis.com/v1beta/openai` with model `gemini-2.5-flash`.
-- Direct NVIDIA OpenAI-compatible API worked at `https://integrate.api.nvidia.com/v1` with model `nvidia/nemotron-3-nano-30b-a3b`.
-- Radware Gemini in-path still needs portal/Radware review. Tested Radware paths including `/v1/gemini`, `/v1/google`, `/v1/google-gemini`, and `/v1/openai`; none produced a valid proxied Gemini result. `/v1/openai` routed to OpenAI and rejected the Gemini upstream key, so it is not the Gemini path.
+- In the interactive wizard, choose `custom` for the in-path provider preset.
+- Enter the Radware proxy endpoint as a full URL, for example `https://api.agentic.radwarecto.com/v1/<provider-path>`.
+- You can also enter `/v1/<provider-path>` or `<provider-path>`; the helper normalizes those forms under `https://api.agentic.radwarecto.com`.
+- Do not use the direct LLM provider base URL as `RADWARE_INPATH_BASE_URL`.
 
 ## Example Provider
 
@@ -71,6 +72,16 @@ Manual or change-control setup:
 ```bash
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --dry-run
 npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup --in-path --runtime-env-file ~/.openclaw/radware.env
+```
+
+For a custom Radware provider path in non-interactive setup:
+
+```bash
+npx -y -p openclaw-radware-agentic-protection@latest radware-openclaw-setup \
+  --in-path \
+  --in-path-provider custom \
+  --in-path-endpoint /v1/<provider-path> \
+  --runtime-env-file ~/.openclaw/radware.env
 ```
 
 If OpenClaw uses a custom config path, add `--config /path/to/openclaw.json`.
